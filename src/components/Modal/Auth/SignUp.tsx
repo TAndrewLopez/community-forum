@@ -4,18 +4,32 @@ import { useState } from "react";
 import { useSetRecoilState } from "recoil";
 import { useCreateUserWithEmailAndPassword } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase/clientApp";
+import { FIREBASE_ERRORS } from "@/firebase/errors";
 
 const SignUp: React.FC = () => {
   const setAuthModalState = useSetRecoilState(authModalState);
+  const [error, setError] = useState("");
   const [signUpForm, setSignUpForm] = useState({
     email: "",
     password: "",
+    confirmPassword: "",
   });
 
-  const [createUserWithEmailAndPassword, user, loading, error] =
+  const [createUserWithEmailAndPassword, user, loading, userError] =
     useCreateUserWithEmailAndPassword(auth);
+
   //FIREBASE LOGIN HANDLES SUBMIT
-  const handleSubmit = () => {};
+  const handleSubmit = (evt: React.FormEvent<HTMLFormElement>) => {
+    evt.preventDefault();
+    if (error) setError("");
+    //VALIDATE PASSWORD
+    if (signUpForm.password !== signUpForm.confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
+    createUserWithEmailAndPassword(signUpForm.email, signUpForm.password);
+  };
 
   const handleChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
     setSignUpForm({
@@ -80,7 +94,18 @@ const SignUp: React.FC = () => {
         }}
         bg="gray.50"
       />
-      <Button width="100%" height="36px" my={2} type="submit">
+
+      <Text textAlign="center" color="red" fontSize={"10pt"}>
+        {error ||
+          FIREBASE_ERRORS[userError?.message as keyof typeof FIREBASE_ERRORS]}
+      </Text>
+
+      <Button
+        width="100%"
+        height="36px"
+        my={2}
+        type="submit"
+        isLoading={loading}>
         Sign Up
       </Button>
       <Flex fontSize="9pt" justifyContent="center">
