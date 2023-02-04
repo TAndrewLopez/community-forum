@@ -1,3 +1,5 @@
+import { authModalState } from "@/atoms/authModalAtom";
+import { auth } from "@/firebase/clientApp";
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import {
   Flex,
@@ -10,14 +12,12 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { signOut, User } from "firebase/auth";
+import { CgProfile } from "react-icons/cg";
 import { FaRedditSquare } from "react-icons/fa";
 import { IoSparkles } from "react-icons/io5";
-import { VscAccount } from "react-icons/vsc";
-import { CgProfile } from "react-icons/cg";
 import { MdOutlineLogin } from "react-icons/md";
-import { auth } from "@/firebase/clientApp";
+import { VscAccount } from "react-icons/vsc";
 import { useSetRecoilState } from "recoil";
-import { authModalState } from "@/atoms/authModalAtom";
 
 type UserMenuProps = {
   user?: User | null;
