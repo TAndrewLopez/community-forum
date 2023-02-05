@@ -65,7 +65,6 @@ const NewPostForm: React.FC<NewPostFormProps> = ({ user }) => {
   const [error, setError] = useState(false);
 
   const handleCreatePost = async () => {
-    if (!textInputs.title) return;
     const { communityId } = router.query;
 
     const newPost: Post = {
