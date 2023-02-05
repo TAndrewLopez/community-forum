@@ -1,4 +1,7 @@
-import { postState } from "@/atoms/postsAtom";
+import { Post, postState } from "@/atoms/postsAtom";
+import { firestore, storage } from "@/firebase/clientApp";
+import { deleteDoc, doc } from "firebase/firestore";
+import { deleteObject, ref } from "firebase/storage";
 import { useRecoilState } from "recoil";
 
 const usePosts = () => {
@@ -8,7 +11,26 @@ const usePosts = () => {
 
   const onSelectPost = () => {};
 
-  const onDeletePost = async () => {};
+  const onDeletePost = async (post: Post): Promise<boolean> => {
+    try {
+      if (post.imageURL) {
+        const imageRef = ref(storage, `posts/${post.id}/image`);
+        await deleteObject(imageRef);
+      }
+      const postDocRef = doc(firestore, "posts", post.id!);
+      await deleteDoc(postDocRef);
+
+      setPostStateValue((prev) => ({
+        ...prev,
+        posts: prev.posts.filter((item) => item.id !== post.id),
+      }));
+
+      return true;
+    } catch (error: any) {
+      console.log("onDeletePost error", error.message);
+      return false;
+    }
+  };
 
   return {
     postStateValue,
