@@ -1,9 +1,26 @@
-import { Post } from "@/atoms/postsAtom";
-import { Box, Flex } from "@chakra-ui/react";
+import { Post, postState } from "@/atoms/postsAtom";
+import { firestore } from "@/firebase/clientApp";
+import {
+  Box,
+  Flex,
+  SkeletonCircle,
+  SkeletonText,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
 import { User } from "firebase/auth";
+import {
+  collection,
+  doc,
+  increment,
+  serverTimestamp,
+  Timestamp,
+  writeBatch,
+} from "firebase/firestore";
 import { useEffect, useState } from "react";
+import { useSetRecoilState } from "recoil";
 import CommentInput from "./CommentInput";
-
+import CommentItem, { Comment } from "./CommentItem";
 type CommentsProps = {
   user: User;
   selectedPost: Post | null;
@@ -16,15 +33,65 @@ const Comments: React.FC<CommentsProps> = ({
   communityId,
 }) => {
   const [commentText, setCommentText] = useState("");
-  const [comments, setComments] = useState([]);
+  const [comments, setComments] = useState<Comment[]>([]);
   const [fetchLoading, setFetchLoading] = useState(false);
   const [createLoading, setCreateLoading] = useState(false);
+  const setPostState = useSetRecoilState(postState);
 
-  const onCreateComment = async () => {};
+  const onCreateComment = async () => {
+    setCreateLoading(true);
+    try {
+      const batch = writeBatch(firestore);
+      const commentDocRef = doc(collection(firestore, "comments"));
+      const newComment: Comment = {
+        id: commentDocRef.id,
+        creatorId: user.uid,
+        creatorDisplayText: user.email!.split("@")[0],
+        communityId,
+        postId: selectedPost?.id!,
+        postTitle: selectedPost?.title!,
+        text: commentText,
+        createdAt: serverTimestamp() as Timestamp,
+      };
+      batch.set(commentDocRef, newComment);
 
-  const onDeleteComment = async () => {};
+      newComment.createdAt = { seconds: Date.now() / 1000 } as Timestamp;
 
-  const getPostComments = async () => {};
+      const postDocRef = doc(firestore, "posts", selectedPost?.id!);
+      batch.update(postDocRef, {
+        numberOfComments: increment(1),
+      });
+
+      await batch.commit();
+
+      setCommentText("");
+      setComments((prev) => [newComment, ...prev]);
+      setPostState((prev) => ({
+        ...prev,
+        selectedPost: {
+          ...prev.selectedPost,
+          numberOfComments: prev.selectedPost?.numberOfComments! + 1,
+        } as Post,
+      }));
+    } catch (error) {
+      console.log("onCreateComment error", error);
+    }
+    setCreateLoading(false);
+  };
+
+  const onDeleteComment = async () => {
+    try {
+    } catch (error) {
+      console.log("onDeleteComment error", error);
+    }
+  };
+
+  const getPostComments = async () => {
+    try {
+    } catch (error) {
+      console.log("getPostComments error", error);
+    }
+  };
 
   useEffect(() => {
     getPostComments();
@@ -47,6 +114,47 @@ const Comments: React.FC<CommentsProps> = ({
           onCreateComment={onCreateComment}
         />
       </Flex>
+
+      <Stack spacing={6} p={2}>
+        {fetchLoading ? (
+          <>
+            {[0, 1, 2].map((item, i) => (
+              <Box key={item + i} padding="6" bg="white">
+                <SkeletonCircle size="10" />
+                <SkeletonText mt="4" noOfLines={2} spacing="4" />
+              </Box>
+            ))}
+          </>
+        ) : (
+          <>
+            {comments.length === 0 ? (
+              <Flex
+                direction="column"
+                justify="center"
+                align="center"
+                borderTop="1px solid"
+                borderColor="gray.100"
+                p={20}>
+                <Text fontWeight={700} opacity={0.3}>
+                  No comments yet.
+                </Text>
+              </Flex>
+            ) : (
+              <>
+                {comments.map((comment, i) => (
+                  <CommentItem
+                    comment={comment}
+                    onDeleteComment={onDeleteComment}
+                    loadingDelete={false}
+                    userId={user.uid}
+                    key={comment.postId + i}
+                  />
+                ))}
+              </>
+            )}
+          </>
+        )}
+      </Stack>
     </Box>
   );
 };
