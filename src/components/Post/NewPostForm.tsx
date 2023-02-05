@@ -89,12 +89,12 @@ const NewPostForm: React.FC<NewPostFormProps> = ({ user }) => {
           imageURL: downloadURL,
         });
       }
+      router.back();
     } catch (error: any) {
       console.log("handleCreatePost error", error.message);
       setError(true);
     }
     setLoading(false);
-    // router.back();
   };
 
   const onSelectImage = (evt: React.ChangeEvent<HTMLInputElement>) => {
