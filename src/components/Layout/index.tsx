@@ -1,7 +1,8 @@
+import { ReactNode } from "react";
 import Navbar from "../Navbar";
 
 type LayoutProps = {
-  // children: any;
+  children: ReactNode;
 };
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
