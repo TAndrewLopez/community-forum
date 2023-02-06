@@ -53,6 +53,7 @@ const Posts: React.FC<PostsProps> = ({ communityData }) => {
   useEffect(() => {
     getPosts();
   }, [communityData]);
+
   return (
     <>
       {loading ? (
