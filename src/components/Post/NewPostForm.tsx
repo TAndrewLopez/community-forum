@@ -71,20 +71,31 @@ const NewPostForm: React.FC<NewPostFormProps> = ({
   const handleCreatePost = async () => {
     const { communityId } = router.query;
 
-    const newPost: Post = {
-      communityId: communityId as string,
-      communityImageURL: communityImageURL || "",
-      creatorId: user?.uid,
-      creatorDisplayName: user.email!.split("@")[0],
-      title: textInputs.title,
-      body: textInputs.body,
-      numberOfComments: 0,
-      voteStatus: 0,
-      createdAt: serverTimestamp() as Timestamp,
-    };
+    // const newPost: Post = {
+    //   communityId: communityId as string,
+    //   communityImageURL: communityImageURL || "",
+    //   creatorId: user?.uid,
+    //   creatorDisplayName: user.email!.split("@")[0],
+    //   title: textInputs.title,
+    //   body: textInputs.body,
+    //   numberOfComments: 0,
+    //   voteStatus: 0,
+    //   createdAt: serverTimestamp() as Timestamp,
+    // };
     setLoading(true);
     try {
-      const postDocRef = await addDoc(collection(firestore, "posts"), newPost);
+      // const postDocRef = await addDoc(collection(firestore, "posts"), newPost);
+      const postDocRef = await addDoc(collection(firestore, "posts"), {
+        communityId: communityId as string,
+        communityImageURL: communityImageURL || "",
+        creatorId: user?.uid,
+        creatorDisplayName: user.email!.split("@")[0],
+        title: textInputs.title,
+        body: textInputs.body,
+        numberOfComments: 0,
+        voteStatus: 0,
+        createdAt: serverTimestamp() as Timestamp,
+      });
 
       if (selectedFile) {
         const imageRef = ref(storage, `posts/${postDocRef.id}/image`);
