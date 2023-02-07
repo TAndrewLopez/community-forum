@@ -7,7 +7,7 @@ const PersonalHome: React.FC = () => {
       direction="column"
       bg="white"
       borderRadius={4}
-      cursor="pointer"
+      // cursor="pointer"
       border="1px solid"
       borderColor="gray.300"
       position="sticky">
@@ -16,10 +16,10 @@ const PersonalHome: React.FC = () => {
         color="white"
         p="6px 10px"
         bg="blue.500"
-        height="34px"
+        height="62px"
         borderRadius="4px 4px 0px 0px"
         fontWeight={600}
-        bgImage="url(/images/redditPersonalHome.png)"
+        bgImage="url(/images/personalBanner.png)"
         bgSize="cover"></Flex>
       <Flex direction="column" p="12px">
         <Flex align="center" mb={2}>
