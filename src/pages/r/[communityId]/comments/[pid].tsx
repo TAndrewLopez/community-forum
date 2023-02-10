@@ -5,6 +5,7 @@ import Comments from "@/components/Post/Comments/Comments";
 import PostItem from "@/components/Post/PostItem";
 import { auth, firestore } from "@/firebase/clientApp";
 import useCommunityData from "@/hooks/useCommunityData";
+import useDirectory from "@/hooks/useDirectory";
 import usePosts from "@/hooks/usePosts";
 import { User } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
@@ -16,6 +17,7 @@ const PostPage: React.FC = () => {
   const [user] = useAuthState(auth);
   const router = useRouter();
   const { communityStateValue } = useCommunityData();
+  const { directoryState, toggleMenuOpen } = useDirectory();
   const { postStateValue, setPostStateValue, onDeletePost, onVote } =
     usePosts();
 
@@ -31,6 +33,13 @@ const PostPage: React.FC = () => {
       console.log("fetchPost error", error);
     }
   };
+
+  useEffect(() => {
+    console.log("this");
+    if (directoryState.isOpen) {
+      toggleMenuOpen();
+    }
+  }, []);
 
   useEffect(() => {
     const { pid } = router.query;

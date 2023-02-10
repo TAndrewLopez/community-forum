@@ -53,7 +53,7 @@ const Directory: React.FC = () => {
           <ChevronDownIcon />
         </Flex>
       </MenuButton>
-      <MenuList>
+      <MenuList zIndex={5}>
         <Communities />
       </MenuList>
     </Menu>

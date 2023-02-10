@@ -1,7 +1,30 @@
+import { authModalState } from "@/atoms/authModalAtom";
+import useDirectory from "@/hooks/useDirectory";
 import { Button, Flex, Icon, Stack, Text } from "@chakra-ui/react";
+import { auth } from "@/firebase/clientApp";
+import { useRouter } from "next/router";
+import { useAuthState } from "react-firebase-hooks/auth";
 import { FaReddit } from "react-icons/fa";
+import { useSetRecoilState } from "recoil";
 
 const PersonalHome: React.FC = () => {
+  const router = useRouter();
+  const [user] = useAuthState(auth);
+  const setAuthModalState = useSetRecoilState(authModalState);
+  const { toggleMenuOpen } = useDirectory();
+
+  const handleClick = () => {
+    if (!user) {
+      setAuthModalState({ open: true, view: "login" });
+      return;
+    }
+    const { communityId } = router.query;
+    if (communityId) {
+      router.push(`/r/${communityId}/submit`);
+    }
+    toggleMenuOpen();
+  };
+
   return (
     <Flex
       direction="column"
@@ -30,8 +53,15 @@ const PersonalHome: React.FC = () => {
           <Text fontSize="9pt">
             Your personal Reddit front page, built for you.
           </Text>
-          <Button height="30px">Create Post</Button>
-          <Button variant="outline" height="30px">
+
+          <Button onClick={handleClick} name="post" height="30px">
+            Create Post
+          </Button>
+          <Button
+            onClick={handleClick}
+            name="community"
+            variant="outline"
+            height="30px">
             Create Community
           </Button>
         </Stack>
